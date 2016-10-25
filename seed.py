@@ -82,8 +82,6 @@ def load_ratings():
     db.session.commit()
 
 
-
-
 def set_val_user_id():
     """Set value for the next user_id after seeding database"""
 
