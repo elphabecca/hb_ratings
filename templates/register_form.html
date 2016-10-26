@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="/register" id="register_form" method="POST">
+    <label>First name: 
+        <input type="text" id="fname" name="fname" required></label><br><br>
+    <label>Last name: 
+        <input type="text" id="lname" name="lname" required></label><br><br>
+    <label>Your age: 
+        <input type="number" id="age" name="age"></label><br><br>
+    <label>Zip code: 
+        <input type="text" id="zipcode" name="zipcode"></label><br><br>
+    <label>Email: 
+        <input type="text" id="email" name="email" required></label><br><br>
+    <label>Password: 
+        <input type="password" id="password" name="password" required></label><br><br>
+    <input type="submit" id="register_submit" value="Sign me up!">
+</form>
+
+{% endblock %}
