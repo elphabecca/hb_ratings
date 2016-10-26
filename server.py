@@ -52,8 +52,10 @@ def show_form_results():
     password = request.form.get("password")
 
     current_user = User.query.filter_by(email=email).all()
-    print current_user
+    current_user_email = current_user[0].email
+    current_user_pw = current_user[0].password
 
+    # Current user is not yet in DB
     if current_user == []:
 
         # add the new user to database
@@ -61,19 +63,41 @@ def show_form_results():
         db.session.add(new_user)
         db.session.commit()
 
+        # Sets session for current user
+        session['current_user'] = email
         flash("Welcome new super-rater of super-movies. You're SUPER.")
-        print "\n\n\n\nTHIS USER IS NEW %s is IN THE DATABASE???\n\n\n\n" % new_user
+
         return redirect("/")
+
+    # Current user is already in DB -- check for password verification    
     else:
-        flash("Welcome back!  You're logged in!")
-        print "\n\n\n\nTHIS USER IS IN\n\n\n\n"
-        return redirect("/")
+
+        if password == current_user_pw:
+            session['current_user'] = email
+            flash("Welcome back!  You're logged in!")
+
+            return redirect("/")
+
+        else:
+            flash("Wrong Password. Try again.")
+
+            return redirect('/login')
 
 @app.route('/login')
 def login_form():
     """Display Login Form"""
 
     return render_template('login.html')
+
+
+@app.route('/logout')
+def logout_page():
+    """Display logout page"""
+
+    session['current_user'] = None
+    flash("You've been successfully logged out.")
+
+    return redirect("/")
 
 
 if __name__ == "__main__":
