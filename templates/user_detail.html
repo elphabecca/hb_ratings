@@ -9,8 +9,10 @@
     </ul>
     
     <ul>
-    {% for rating in list_o_movies %}
-        <li>{{ rating.movie.title }}, {{ rating.score }}</li>
+    {% for rating in list_o_ratings %}
+        <li>Movie name: {{ rating.movie.title }}</li>
+        <li>Your rating: {{ rating.score }}</li>
+        <br><br>
     {% endfor %}
     </ul>
 

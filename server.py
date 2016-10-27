@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, jsonify, render_template, redirect, request, flash, session
+from flask import Flask, jsonify, render_template, redirect, request, flash, session, url_for
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
 
@@ -38,28 +38,19 @@ def show_user_detail(user_id):
     """Shows user details."""
     
     curr_user = User.query.get(user_id)
-    print
-    print
-    print curr_user
-    print curr_user.ratings
-    print 
-    print "**************"
 
     movies = Movie.query.all()
 
-    # title = movies.filter(Movie.movie_id == )
-
     age = curr_user.age
     zipcode = curr_user.zipcode
-    list_o_movies = curr_user.ratings
-
+    list_o_ratings = curr_user.ratings
 
     return render_template('user_detail.html',
                            user_id=user_id,
                            movies=movies,
                            age=age,
                            zipcode=zipcode,
-                           list_o_movies=list_o_movies)
+                           list_o_ratings=list_o_ratings)
 
 @app.route('/register', methods=["GET"])
 def register_form():
@@ -80,8 +71,6 @@ def show_form_results():
     password = request.form.get("password")
 
     current_user = User.query.filter_by(email=email).all()
-    current_user_email = current_user[0].email
-    current_user_pw = current_user[0].password
 
     # Current user is not yet in DB
     if current_user == []:
@@ -95,20 +84,26 @@ def show_form_results():
         session['current_user'] = email
         flash("Welcome new super-rater of super-movies. You're SUPER.")
 
-        return redirect("/")
+        user_id = new_user.user_id
+
+        return redirect('/users/' + str(user_id))
 
     # Current user is already in DB -- check for password verification    
     else:
+
+        current_user_email = current_user[0].email
+        current_user_pw = current_user[0].password
 
         if password == current_user_pw:
             session['current_user'] = email
             flash("Welcome back!  You're logged in!")
 
-            return redirect("/")
+            user_id = current_user[0].user_id
+
+            return redirect('/users/' + str(user_id))
 
         else:
             flash("Wrong Password. Try again.")
-
             return redirect('/login')
 
 @app.route('/login')
@@ -122,7 +117,7 @@ def login_form():
 def logout_page():
     """Display logout page"""
 
-    session['current_user'] = None
+    del session['current_user']
     flash("You've been successfully logged out.")
 
     return redirect("/")
