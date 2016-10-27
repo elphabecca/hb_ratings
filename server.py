@@ -33,13 +33,39 @@ def user_list():
     users = User.query.all()
     return render_template("user_list.html", users=users)
 
-@app.route('/users/<user_id>')
+
+@app.route('/movies')
+def movie_list():
+    """Show list of movies."""
+
+    movies = Movie.query.order_by(Movie.title).all()
+    return render_template("movie_list.html", movies=movies)
+
+
+@app.route('/movies/<int:movie_id>')
+def show_movie_detail(movie_id):
+    """Shows movie details."""
+
+    curr_movie = Movie.query.get(movie_id)
+    list_o_ratings = curr_movie.ratings
+    
+    # Math to find average rating
+    sum_ratings = 0
+    for rating in list_o_ratings:
+        sum_ratings += rating.score
+    avg_rating = float(sum_ratings/len(list_o_ratings))
+    
+    return render_template("movie_detail.html",
+                           list_o_ratings=list_o_ratings,
+                           curr_movie=curr_movie,
+                           avg_rating=avg_rating)
+
+
+@app.route('/users/<int:user_id>')
 def show_user_detail(user_id):
     """Shows user details."""
     
     curr_user = User.query.get(user_id)
-
-    movies = Movie.query.all()
 
     age = curr_user.age
     zipcode = curr_user.zipcode
@@ -47,7 +73,6 @@ def show_user_detail(user_id):
 
     return render_template('user_detail.html',
                            user_id=user_id,
-                           movies=movies,
                            age=age,
                            zipcode=zipcode,
                            list_o_ratings=list_o_ratings)
@@ -104,6 +129,7 @@ def show_form_results():
 
         else:
             flash("Wrong Password. Try again.")
+
             return redirect('/login')
 
 @app.route('/login')
@@ -117,7 +143,7 @@ def login_form():
 def logout_page():
     """Display logout page"""
 
-    del session['current_user']
+    session['current_user'] = None
     flash("You've been successfully logged out.")
 
     return redirect("/")
