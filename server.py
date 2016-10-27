@@ -33,6 +33,34 @@ def user_list():
     users = User.query.all()
     return render_template("user_list.html", users=users)
 
+@app.route('/users/<user_id>')
+def show_user_detail(user_id):
+    """Shows user details."""
+    
+    curr_user = User.query.get(user_id)
+    print
+    print
+    print curr_user
+    print curr_user.ratings
+    print 
+    print "**************"
+
+    movies = Movie.query.all()
+
+    # title = movies.filter(Movie.movie_id == )
+
+    age = curr_user.age
+    zipcode = curr_user.zipcode
+    list_o_movies = curr_user.ratings
+
+
+    return render_template('user_detail.html',
+                           user_id=user_id,
+                           movies=movies,
+                           age=age,
+                           zipcode=zipcode,
+                           list_o_movies=list_o_movies)
+
 @app.route('/register', methods=["GET"])
 def register_form():
     """Form for registering a new user."""
@@ -63,7 +91,7 @@ def show_form_results():
         db.session.add(new_user)
         db.session.commit()
 
-        # Sets session for current user
+        # Set session for current user
         session['current_user'] = email
         flash("Welcome new super-rater of super-movies. You're SUPER.")
 
