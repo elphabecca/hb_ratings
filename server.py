@@ -54,11 +54,25 @@ def show_movie_detail(movie_id):
     for rating in list_o_ratings:
         sum_ratings += rating.score
     avg_rating = float(sum_ratings/len(list_o_ratings))
-    
+
+    # logic for if user is logged in and rating flow
+    if session['current_user'] is not None:
+        user_id = session['current_user']
+        movie_id = movie_id
+        curr_user = User.query.get(user_id)
+        curr_rating = Rating.query.filter_by(movie_id=movie_id, user_id=user_id).all()
+        print "\n\n\n", curr_rating
+        if curr_rating == []:
+            # they don't have a rating for this movie
+            print "cheese"
+        else:
+            curr_score = curr_rating[0].score
+ 
     return render_template("movie_detail.html",
                            list_o_ratings=list_o_ratings,
                            curr_movie=curr_movie,
-                           avg_rating=avg_rating)
+                           avg_rating=avg_rating,
+                           curr_score=curr_score)
 
 
 @app.route('/users/<int:user_id>')
@@ -106,10 +120,10 @@ def show_form_results():
         db.session.commit()
 
         # Set session for current user
-        session['current_user'] = email
-        flash("Welcome new super-rater of super-movies. You're SUPER.")
-
         user_id = new_user.user_id
+
+        session['current_user'] = user_id
+        flash("Welcome new super-rater of super-movies. You're SUPER.")
 
         return redirect('/users/' + str(user_id))
 
@@ -118,9 +132,10 @@ def show_form_results():
 
         current_user_email = current_user[0].email
         current_user_pw = current_user[0].password
+        current_user_id = current_user[0].user_id
 
         if password == current_user_pw:
-            session['current_user'] = email
+            session['current_user'] = current_user_id
             flash("Welcome back!  You're logged in!")
 
             user_id = current_user[0].user_id
